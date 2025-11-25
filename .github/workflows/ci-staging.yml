@@ -8,7 +8,7 @@ jobs:
   staging-check:
     runs-on: ubuntu-latest
     steps:
-      # sama persis kayak development, cuma tambah komentar
+      # same as the development, only adding some comments
       - name: Checkout code
         uses: actions/checkout@v4
         with:
