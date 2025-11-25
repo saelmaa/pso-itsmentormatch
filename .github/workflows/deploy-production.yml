@@ -1,0 +1,58 @@
+name: CD - Deploy to Production
+
+on:
+  push:
+    branches: [ main ]
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Setup PHP 8.4
+        uses: shivammathur/setup-php@v2
+        with:
+          php-version: '8.4'
+
+      - name: Install Composer deps
+        run: composer install --no-dev --optimize-autoloader
+
+      - name: Install & Build assets
+        run: |
+          npm ci
+          npm run build
+
+      - name: Run tests (fail fast)
+        run: php artisan test
+
+      - name: Create production ZIP
+        run: |
+          zip -r deploy-prod.zip . -x "vendor/*" "node_modules/*" ".git/*" "tests/*" ".env*"
+
+      - name: Deploy to Hostinger VPS
+        uses: appleboy/scp-action@v0.1.7
+        with:
+          host: ${{ secrets.VPS_IP }}
+          username: ${{ secrets.SSH_USERNAME }}
+          key: ${{ secrets.SSH_PRIVATE_KEY }}
+          source: "deploy-prod.zip"
+          target: "/var/www/its-mentormatch/"
+
+      - name: Execute commands on VPS
+        uses: appleboy/ssh-action@v0.1.10
+        with:
+          host: ${{ secrets.VPS_IP }}
+          username: ${{ secrets.SSH_USERNAME }}
+          key: ${{ secrets.SSH_PRIVATE_KEY }}
+          script: |
+            cd /var/www/its-mentormatch
+            unzip -o deploy-prod.zip
+            composer install --no-dev --optimize-autoloader
+            php artisan key:generate --force
+            php artisan config:cache
+            php artisan route:cache
+            php artisan view:cache
+            systemctl reload php8.4-fpm
+            echo "Deployed successfully at $(date)"
