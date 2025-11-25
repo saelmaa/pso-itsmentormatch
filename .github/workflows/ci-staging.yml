@@ -2,7 +2,7 @@ name: CI - Staging (Pull Request to main)
 
 on:
   pull_request:
-    branches: [ main ]
+    branches: [ master ]
 
 jobs:
   staging-check:
