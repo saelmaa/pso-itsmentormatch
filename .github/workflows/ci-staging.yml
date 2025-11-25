@@ -1,0 +1,23 @@
+name: CI - Staging (Pull Request to main)
+
+on:
+  pull_request:
+    branches: [ main ]
+
+jobs:
+  staging-check:
+    runs-on: ubuntu-latest
+    steps:
+      # sama persis kayak development, cuma tambah komentar
+      - name: Checkout code
+        uses: actions/checkout@v4
+        with:
+          ref: ${{ github.event.pull_request.head.sha }}
+
+      - name: Setup PHP + Install + Build + Test
+        run: |
+          php -v
+          composer install --no-dev
+          npm ci
+          npm run build
+          php artisan test --coverage
