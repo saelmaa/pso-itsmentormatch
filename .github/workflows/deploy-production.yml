@@ -66,3 +66,4 @@ jobs:
             php artisan view:cache
             systemctl reload php8.4-fpm
             echo "Deployed successfully at $(date)"
+""    # tambah spasi di akhir file
