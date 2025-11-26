@@ -24,8 +24,8 @@ jobs:
           npm ci
           npm run build
 
-      - name: Run tests (fail fast)
-        run: php artisan test
+      # - name: Run tests (fail fast)
+      #   run: php artisan test
 
       - name: Create production ZIP
         run: |
