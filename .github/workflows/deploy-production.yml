@@ -37,8 +37,18 @@ jobs:
           host: ${{ secrets.VPS_IP }}
           username: ${{ secrets.SSH_USERNAME }}
           key: ${{ secrets.SSH_PRIVATE_KEY }}
-          source: "deploy-prod.zip"
-          target: "/var/www/its-mentormatch/"
+          port: 22
+          source: "production.zip"
+          target: "/home/${{ secrets.SSH_USERNAME }}/domains/nama-domain.com/public_html/"
+
+      # - name: Deploy to Hostinger VPS
+      #   uses: appleboy/scp-action@v0.1.7
+      #   with:
+      #     host: ${{ secrets.VPS_IP }}
+      #     username: ${{ secrets.SSH_USERNAME }}
+      #     key: ${{ secrets.SSH_PRIVATE_KEY }}
+      #     source: "deploy-prod.zip"
+      #     target: "/var/www/its-mentormatch/"
 
       - name: Execute commands on VPS
         uses: appleboy/ssh-action@v0.1.10
