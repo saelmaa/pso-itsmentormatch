@@ -52,7 +52,7 @@ jobs:
           username: ${{ secrets.SSH_USERNAME }}
           key: ${{ secrets.SSH_PRIVATE_KEY }}
           script: |
-            cd /home/${{ secrets.SSH_USERNAME }}/domains/itsmentormatch.com/public_html
+            cd /home/${{ secrets.SSH_USERNAME }}/domains/http://72.61.141.156//public_html
             unzip -o production.zip
             rm production.zip
             php artisan migrate --force
