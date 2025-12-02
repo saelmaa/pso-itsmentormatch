@@ -8,56 +8,87 @@ on:
 jobs:
   deploy:
     runs-on: ubuntu-latest
+
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
 
-      # - name: Setup PHP
-      #   uses: shivammathur/setup-php@v2
-      #   with:
-      #     php-version: '8.2'
-      #     coverage: none
-      #     tools: composer
+      - name: Setup PHP
+        uses: shivammathur/setup-php@v2
+        with:
+          php-version: '8.2'
+          coverage: none
+          tools: composer
 
-      # - name: Install Composer dependencies
-      #   run: composer install --no-dev --optimize-autoloader
+      - name: Install Composer dependencies
+        run: composer install --no-dev --optimize-autoloader
 
-      # - name: Install & Build assets
-      #   run: |
-      #     npm install
-      #     npm run build
+      - name: Install & Build assets
+        run: |
+          npm install
+          npm run build
 
-      # - name: Create production ZIP
-      #   run: |
-      #     zip -r production.zip . -x "*.git*" "node_modules/*" "tests/*"
+      # ZIP hasil build, tanpa node_modules, vendor, tests, .git
+      - name: Create production ZIP
+        run: |
+          zip -r production.zip . \
+            -x "node_modules/*" "vendor/*" "tests/*" ".git/*" ".github/*"
 
-      # - name: Deploy to Hostinger VPS
-      #   uses: appleboy/scp-action@v0.1.7
-      #   with:
-      #     host: ${{ secrets.VPS_IP }}
-      #     username: ${{ secrets.SSH_USERNAME }}
-      #     key: ${{ secrets.SSH_PRIVATE_KEY }}
-      #     port: 22
-          # source: "production.zip"
-          # target: "/home/${{ secrets.SSH_USERNAME }}/domains/itsmentormatch.com/public_html/"
-          # strip_components: 0
-          # overwrite: true
+      # Upload ZIP ke /var/www di VPS
+      - name: Deploy to Hostinger VPS (upload ZIP)
+        uses: appleboy/scp-action@v0.1.7
+        with:
+          host: ${{ secrets.VPS_IP }}
+          username: ${{ secrets.SSH_USERNAME }}
+          key: ${{ secrets.SSH_PRIVATE_KEY }}
+          port: 22
+          source: "production.zip"
+          target: "/var/www/"
+          strip_components: 0
+          overwrite: true
 
-      # ini penting biar selalu replace
-
-      - name: Execute commands on VPS
+      # Di VPS: archive lama, extract baru, lalu jalankan Laravel
+      - name: Execute deploy script on VPS
         uses: appleboy/ssh-action@v0.1.10
         with:
           host: ${{ secrets.VPS_IP }}
           username: ${{ secrets.SSH_USERNAME }}
           key: ${{ secrets.SSH_PRIVATE_KEY }}
           script: |
-            echo "Deployment script executed."
-      #       cd /home/${{ secrets.SSH_USERNAME }}/domains/http://72.61.141.156//public_html
-      #       unzip -o production.zip
-      #       rm production.zip
-      #       php artisan migrate --force
-      #       php artisan cache:clear
-      #       php artisan config:cache
-      #       php artisan route:cache
-      #       php artisan view:cache
+            set -e
+
+            APP_DIR="/var/www/pso-itsmentormatch"
+            ARCHIVE_DIR="/var/www/archive"
+            RELEASE_ZIP="/var/www/production.zip"
+            TIMESTAMP=$(date +"%Y%m%d_%H%M%S")
+
+            echo "==> Pastikan folder archive ada"
+            sudo mkdir -p "$ARCHIVE_DIR"
+
+            if [ -d "$APP_DIR" ]; then
+              echo "==> Archive folder lama: $APP_DIR"
+              cd /var/www
+              sudo zip -r "$ARCHIVE_DIR/pso-itsmentormatch_$TIMESTAMP.zip" "pso-itsmentormatch"
+              echo "==> Hapus folder lama"
+              sudo rm -rf "$APP_DIR"
+            fi
+
+            echo "==> Extract release baru ke $APP_DIR"
+            sudo mkdir -p "$APP_DIR"
+            sudo unzip -o "$RELEASE_ZIP" -d "$APP_DIR"
+            sudo rm "$RELEASE_ZIP"
+
+            cd "$APP_DIR"
+
+            echo "==> Install composer deps di server"
+            composer install --no-dev --optimize-autoloader
+
+            echo "==> Jalankan migrasi dan cache Laravel"
+            php artisan migrate --force
+            php artisan cache:clear
+            php artisan config:clear
+            php artisan config:cache
+            php artisan route:cache
+            php artisan view:cache
+
+            echo "==> Deployment selesai pada $(date)"
