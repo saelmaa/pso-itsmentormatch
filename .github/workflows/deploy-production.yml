@@ -93,6 +93,7 @@ jobs:
             composer install --no-dev --optimize-autoloader
 
             echo "==> Jalankan migrasi dan cache Laravel"
+            php artisan key:generate
             php artisan migrate --force
             php artisan cache:clear
             php artisan config:clear
