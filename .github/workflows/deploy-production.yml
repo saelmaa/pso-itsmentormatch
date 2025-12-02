@@ -85,6 +85,10 @@ jobs:
             sudo cp /var/www/.env "$APP_DIR/.env"
             sudo chmod 644 "$APP_DIR/.env"  
 
+            echo "==> Set permissions for storage and bootstrap/cache"
+            sudo chmod -R 775 storage bootstrap/cache
+            sudo chown -R www-data:www-data storage bootstrap/cache
+
             echo "==> Install composer deps di server"
             composer install --no-dev --optimize-autoloader
 
