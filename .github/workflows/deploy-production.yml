@@ -19,29 +19,29 @@ jobs:
           coverage: none
           tools: composer
 
-      - name: Install Composer dependencies
-        run: composer install --no-dev --optimize-autoloader
+      # - name: Install Composer dependencies
+      #   run: composer install --no-dev --optimize-autoloader
 
-      - name: Install & Build assets
-        run: |
-          npm install
-          npm run build
+      # - name: Install & Build assets
+      #   run: |
+      #     npm install
+      #     npm run build
 
-      - name: Create production ZIP
-        run: |
-          zip -r production.zip . -x "*.git*" "node_modules/*" "tests/*"
+      # - name: Create production ZIP
+      #   run: |
+      #     zip -r production.zip . -x "*.git*" "node_modules/*" "tests/*"
 
       - name: Deploy to Hostinger VPS
         uses: appleboy/scp-action@v0.1.7
         with:
           host: ${{ secrets.VPS_IP }}
           username: ${{ secrets.SSH_USERNAME }}
-          password: ${{ secrets.SSH_PASSWORD }}
+          key: ${{ secrets.SSH_PRIVATE_KEY }}
           port: 22
-          source: "production.zip"
-          target: "/home/${{ secrets.SSH_USERNAME }}/domains/itsmentormatch.com/public_html/"
-          strip_components: 0
-          overwrite: true
+          # source: "production.zip"
+          # target: "/home/${{ secrets.SSH_USERNAME }}/domains/itsmentormatch.com/public_html/"
+          # strip_components: 0
+          # overwrite: true
 
       # ini penting biar selalu replace
 
@@ -52,11 +52,12 @@ jobs:
           username: ${{ secrets.SSH_USERNAME }}
           key: ${{ secrets.SSH_PRIVATE_KEY }}
           script: |
-            cd /home/${{ secrets.SSH_USERNAME }}/domains/http://72.61.141.156//public_html
-            unzip -o production.zip
-            rm production.zip
-            php artisan migrate --force
-            php artisan cache:clear
-            php artisan config:cache
-            php artisan route:cache
-            php artisan view:cache
+            echo "Deployment script executed."
+      #       cd /home/${{ secrets.SSH_USERNAME }}/domains/http://72.61.141.156//public_html
+      #       unzip -o production.zip
+      #       rm production.zip
+      #       php artisan migrate --force
+      #       php artisan cache:clear
+      #       php artisan config:cache
+      #       php artisan route:cache
+      #       php artisan view:cache
