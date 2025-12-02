@@ -1,9 +1,9 @@
-name: CI - Development (feature branches)
+name: CI - Development
 
 on:
   push:
     branches:
-      - 'feature/**'
+      - master
 
 jobs:
   test-and-build:

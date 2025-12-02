@@ -1,9 +1,10 @@
 name: CD - Deploy to Production
 
 on:
-  push:
-    branches:
-      - master
+  workflow_run:
+    workflows: ["CI - Development"]
+    types:
+      - completed
 
 jobs:
   deploy:
@@ -79,7 +80,7 @@ jobs:
             sudo rm "$RELEASE_ZIP"
 
             cd "$APP_DIR"
-            
+
             echo "==> Copy .env from /var/www to project directory"
             sudo cp /var/www/.env "$APP_DIR/.env"
             sudo chmod 644 "$APP_DIR/.env"  
