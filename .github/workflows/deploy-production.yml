@@ -12,12 +12,12 @@ jobs:
       - name: Checkout code
         uses: actions/checkout@v4
 
-      - name: Setup PHP
-        uses: shivammathur/setup-php@v2
-        with:
-          php-version: '8.2'
-          coverage: none
-          tools: composer
+      # - name: Setup PHP
+      #   uses: shivammathur/setup-php@v2
+      #   with:
+      #     php-version: '8.2'
+      #     coverage: none
+      #     tools: composer
 
       # - name: Install Composer dependencies
       #   run: composer install --no-dev --optimize-autoloader
@@ -31,13 +31,13 @@ jobs:
       #   run: |
       #     zip -r production.zip . -x "*.git*" "node_modules/*" "tests/*"
 
-      - name: Deploy to Hostinger VPS
-        uses: appleboy/scp-action@v0.1.7
-        with:
-          host: ${{ secrets.VPS_IP }}
-          username: ${{ secrets.SSH_USERNAME }}
-          key: ${{ secrets.SSH_PRIVATE_KEY }}
-          port: 22
+      # - name: Deploy to Hostinger VPS
+      #   uses: appleboy/scp-action@v0.1.7
+      #   with:
+      #     host: ${{ secrets.VPS_IP }}
+      #     username: ${{ secrets.SSH_USERNAME }}
+      #     key: ${{ secrets.SSH_PRIVATE_KEY }}
+      #     port: 22
           # source: "production.zip"
           # target: "/home/${{ secrets.SSH_USERNAME }}/domains/itsmentormatch.com/public_html/"
           # strip_components: 0
