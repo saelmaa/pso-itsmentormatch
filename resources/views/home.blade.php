@@ -4,9 +4,9 @@
 
 @section('content')
 <div class="min-h-screen bg-gray-50 py-8 animate-fade-in">
-    <!-- BANNER SUCCESS WEEK 3 – INI YANG BARU DITAMBAH -->
+    <!-- BANNER SUCCESS WEEK 4 – edit code trial -->
     <div class="bg-gradient-to-r from-green-500 to-emerald-600 text-white py-6 text-center font-bold text-3xl md:text-5xl shadow-lg">
-        WEEK 3 CI/CD FULLY SUCCESS – GROUP 9 
+        WEEK 4 CI/CD FULLY SUCCESS – GROUP 9 
     </div>
     <!-- END BANNER -->
      
