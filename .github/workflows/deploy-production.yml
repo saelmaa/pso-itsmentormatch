@@ -1,104 +1,111 @@
+# This workflow deploys code to Production after the CI - Development workflow completes
 name: CD - Deploy to Production
 
 on:
   workflow_run:
-    workflows: ["CI - Development"]
+    workflows: ["CI - Development"]  # Trigger when CI workflow finishes
     types:
-      - completed
+      - completed  # Only run after CI run is completed successfully
 
 jobs:
   deploy:
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-latest  # Use an Ubuntu runner for deployment
 
     steps:
+      # Fetch the repository code to the runner machine
       - name: Checkout code
         uses: actions/checkout@v4
 
+      # Setup PHP environment so Laravel can run properly
       - name: Setup PHP
         uses: shivammathur/setup-php@v2
         with:
-          php-version: '8.2'
-          coverage: none
-          tools: composer
+          php-version: '8.2'        # Use PHP version 8.2
+          coverage: none            # Disable code coverage tools
+          tools: composer           # Install Composer for dependency management
 
+      # Install required PHP dependencies without dev packages for production
       - name: Install Composer dependencies
         run: composer install --no-dev --optimize-autoloader
 
+      # Install JS dependencies and build frontend assets (Vite/Laravel Mix)
       - name: Install & Build assets
         run: |
           npm install
           npm run build
 
-      # ZIP hasil build, tanpa node_modules, vendor, tests, .git
+      # Create a compressed ZIP file of the production build
+      # Exclude unnecessary directories (node_modules, vendor, etc.)
       - name: Create production ZIP
         run: |
           zip -r production.zip . \
             -x "node_modules/*" "vendor/*" "tests/*" ".git/*" ".github/*"
 
-      # Upload ZIP ke /var/www di VPS
+      # Upload the compressed ZIP file to the Hostinger VPS via SCP
       - name: Deploy to Hostinger VPS (upload ZIP)
         uses: appleboy/scp-action@v0.1.7
         with:
-          host: ${{ secrets.VPS_IP }}
-          username: ${{ secrets.SSH_USERNAME }}
-          key: ${{ secrets.SSH_PRIVATE_KEY }}
-          port: 22
-          source: "production.zip"
-          target: "/var/www/"
+          host: ${{ secrets.VPS_IP }}          # VPS server IP
+          username: ${{ secrets.SSH_USERNAME }} # SSH username
+          key: ${{ secrets.SSH_PRIVATE_KEY }}   # SSH private key for authentication
+          port: 22                              # SSH port
+          source: "production.zip"              # File to upload
+          target: "/var/www/"                   # Destination folder on VPS
           strip_components: 0
-          overwrite: true
+          overwrite: true                       # Replace existing file if exists
 
-      # Di VPS: archive lama, extract baru, lalu jalankan Laravel
+      # Execute commands directly on the VPS to deploy the release
       - name: Execute deploy script on VPS
         uses: appleboy/ssh-action@v0.1.10
         with:
-          host: ${{ secrets.VPS_IP }}
-          username: ${{ secrets.SSH_USERNAME }}
-          key: ${{ secrets.SSH_PRIVATE_KEY }}
+          host: ${{ secrets.VPS_IP }}           # Server IP
+          username: ${{ secrets.SSH_USERNAME }} # SSH username
+          key: ${{ secrets.SSH_PRIVATE_KEY }}   # SSH private key
           script: |
-            set -e
+            set -e  # Stop script on any error
 
-            APP_DIR="/var/www/pso-itsmentormatch"
-            ARCHIVE_DIR="/var/www/archive"
-            RELEASE_ZIP="/var/www/production.zip"
-            TIMESTAMP=$(date +"%Y%m%d_%H%M%S")
+            APP_DIR="/var/www/pso-itsmentormatch"  # Application directory
+            ARCHIVE_DIR="/var/www/archive"         # Directory to store previous releases
+            RELEASE_ZIP="/var/www/production.zip"  # Uploaded ZIP file location
+            TIMESTAMP=$(date +"%Y%m%d_%H%M%S")     # Timestamp for archiving
 
-            echo "==> Pastikan folder archive ada"
-            sudo mkdir -p "$ARCHIVE_DIR"
+            echo "==> Ensure archive folder exists"
+            sudo mkdir -p "$ARCHIVE_DIR"  # Create archive directory if missing
 
             if [ -d "$APP_DIR" ]; then
-              echo "==> Archive folder lama: $APP_DIR"
+              echo "==> Archiving old folder: $APP_DIR"
               cd /var/www
               sudo zip -r "$ARCHIVE_DIR/pso-itsmentormatch_$TIMESTAMP.zip" "pso-itsmentormatch"
-              echo "==> Hapus folder lama"
+              echo "==> Removing old application folder"
               sudo rm -rf "$APP_DIR"
             fi
 
-            echo "==> Extract release baru ke $APP_DIR"
+            echo "==> Extracting new release into $APP_DIR"
             sudo mkdir -p "$APP_DIR"
             sudo unzip -o "$RELEASE_ZIP" -d "$APP_DIR"
-            sudo rm "$RELEASE_ZIP"
+            sudo rm "$RELEASE_ZIP"  # Remove ZIP after extraction
 
             cd "$APP_DIR"
 
-            echo "==> Copy .env from /var/www to project directory"
+            echo "==> Copy .env file from /var/www to project directory"
             sudo cp /var/www/.env "$APP_DIR/.env"
-            sudo chmod 644 "$APP_DIR/.env"  
+            sudo chmod 644 "$APP_DIR/.env"  # Set correct permission for .env file
 
             echo "==> Set permissions for storage and bootstrap/cache"
             sudo chmod -R 775 storage bootstrap/cache
             sudo chown -R www-data:www-data storage bootstrap/cache
 
-            echo "==> Install composer deps di server"
+            echo "==> Install composer dependencies on server"
             composer install --no-dev --optimize-autoloader
 
-            echo "==> Jalankan migrasi dan cache Laravel"
-            php artisan key:generate
-            php artisan migrate --force
-            php artisan cache:clear
-            php artisan config:clear
-            php artisan config:cache
-            php artisan route:cache
-            php artisan view:cache
+           
+            echo "==> Run Laravel migrations and cache optimizations"
+            php artisan key:generate  # Ensure app key exists
+            php artisan migrate --force  # Apply database migrations in production
+            php artisan cache:clear     # Clear application cache
+            php artisan config:clear    # Clear config cache
+            php artisan config:cache    # Rebuild config cache
+            php artisan route:cache     # Cache routes
+            php artisan view:cache      # Cache Blade views
 
-            echo "==> Deployment selesai pada $(date)"
+            echo "==> Deployment finished at $(date)"  # Deployment timestamp output
