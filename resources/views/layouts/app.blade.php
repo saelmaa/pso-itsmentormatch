@@ -80,6 +80,10 @@
                     <a href="{{ route('guidelines') }}" class="text-white hover:text-teal-600 font-semibold transition-colors {{ request()->routeIs('guidelines') ? 'text-teal-600 border-b-2 border-teal-600' : '' }}">
                         Guidelines
                     </a>
+                    {{-- 🔹 New: FAQ link in navbar --}}
+                    <a href="{{ route('faq') }}" class="text-white hover:text-teal-600 font-semibold transition-colors {{ request()->routeIs('faq') ? 'text-teal-600 border-b-2 border-teal-600' : '' }}">
+                        FAQ
+                    </a>
                 </div>
 
                 <!-- Auth Links -->
@@ -167,7 +171,8 @@
                     <ul class="space-y-2 text-gray-400">
                         <li><a href="#" class="hover:text-white transition-colors">Help Center</a></li>
                         <li><a href="#" class="hover:text-white transition-colors">Contact Us</a></li>
-                        <li><a href="#" class="hover:text-white transition-colors">FAQ</a></li>
+                        {{-- 🔹 Make FAQ in footer link to the new FAQ route --}}
+                        <li><a href="{{ route('faq') }}" class="hover:text-white transition-colors">FAQ</a></li>
                     </ul>
                 </div>
                 <div>
