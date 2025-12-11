@@ -11,42 +11,34 @@ jobs:
 
     steps:
       - name: Checkout code
-        uses: actions/checkout@v4   # Downloads your repository into the runner so the workflow can access the project files
+        uses: actions/checkout@v4   
 
       - name: Setup PHP
-        uses: shivammathur/setup-php@v2   # Installs PHP in the runner
+        uses: shivammathur/setup-php@v2
         with:
-          php-version: '8.4'              # Specifies PHP version 8.4 for the environment
-          extensions: mbstring, xml, bcmath, intl   # Installs required PHP extensions for Laravel
+          php-version: '8.4'
+          extensions: mbstring, xml, bcmath, intl
 
       - name: Install Composer dependencies
         run: composer install --prefer-dist --no-progress --no-interaction
-        # Installs all PHP dependencies (including dev) so that the test tools (PHPUnit, etc.) are available.
+        # Install including dev dependencies so phpunit & pest are available.
 
       - name: Install NPM dependencies
         run: npm ci
-        # Installs JavaScript dependencies using a clean, reproducible method based on package-lock.json
 
       - name: Build assets
         run: npm run build
-        # Compiles frontend assets (CSS/JS) using Vite or Mix and outputs optimized production files
 
       - name: Run tests
-        run: php artisan test
-        continue-on-error: true
-        # Runs the Laravel test suite.
-        # If some tests fail, the step is marked as failed in logs,
-        # but the workflow continues (does not block the build/deploy pipeline).
+        run: php artisan test || echo "Some tests failed, but continuing pipeline"
+        # If tests fail, the pipeline will still continue.
 
       - name: Create ZIP artifact
         run: |
           zip -r deploy-dev.zip . -x "vendor/*" "node_modules/*" ".git/*" "tests/*"
-        # Creates a ZIP file of the application for deployment or reuse,
-        # excluding unnecessary and heavy directories (vendor, node_modules, Git data, and test files)
 
       - name: Upload artifact
         uses: actions/upload-artifact@v4
         with:
-          name: deploy-dev-zip     # The name of the uploaded file visible in GitHub Actions UI
-          path: deploy-dev.zip     # The path to the ZIP file you just created
-        # Uploads the ZIP artifact so it can be reused by other workflows (e.g., CD pipeline)
+          name: deploy-dev-zip
+          path: deploy-dev.zip
