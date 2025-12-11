@@ -302,6 +302,51 @@ class ReviewControllerTest extends TestCase
     }
 
     /**
+     * Test: Review create redirects when session already reviewed
+     */
+    public function test_review_create_redirects_when_session_already_reviewed(): void
+    {
+        // Create a review for this session
+        Review::create([
+            'user_id' => $this->user->id,
+            'mentor_id' => $this->mentor->id,
+            'session_id' => $this->session->id,
+            'rating' => 5,
+            'feedback' => 'Already reviewed',
+        ]);
+
+        // Try to access create form for already-reviewed session
+        $response = $this->actingAs($this->user)->get(route('reviews.create', ['session' => $this->session->id]));
+
+        $response->assertRedirect(route('sessions.index'));
+        $response->assertSessionHas('error', 'You have already reviewed this session.');
+    }
+
+    /**
+     * Test: Review create shows session when no prior review
+     */
+    public function test_review_create_shows_session_when_not_reviewed(): void
+    {
+        $response = $this->actingAs($this->user)->get(route('reviews.create', ['session' => $this->session->id]));
+
+        $response->assertStatus(200);
+        $response->assertViewIs('reviews.create');
+        $response->assertViewHas('session', $this->session);
+    }
+
+    /**
+     * Test: Review create shows mentors when no session specified
+     */
+    public function test_review_create_shows_mentors_without_session(): void
+    {
+        $response = $this->actingAs($this->user)->get(route('reviews.create'));
+
+        $response->assertStatus(200);
+        $response->assertViewIs('reviews.create');
+        $response->assertViewHas('mentors');
+    }
+
+    /**
      * Test: Review index page loads
      */
     public function test_review_index_page_loads(): void
