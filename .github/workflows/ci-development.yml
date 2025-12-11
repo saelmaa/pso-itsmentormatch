@@ -20,9 +20,8 @@ jobs:
           extensions: mbstring, xml, bcmath, intl   # Installs required PHP extensions for Laravel
 
       - name: Install Composer dependencies
-        run: composer install --no-dev --optimize-autoloader
-        # Installs PHP dependencies for the application, excluding dev packages,
-        # and optimizes autoloading to mirror production behavior.
+        run: composer install --prefer-dist --no-progress --no-interaction
+        # Installs all PHP dependencies (including dev) so that the test tools (PHPUnit, etc.) are available.
 
       - name: Install NPM dependencies
         run: npm ci
@@ -33,11 +32,11 @@ jobs:
         # Compiles frontend assets (CSS/JS) using Vite or Mix and outputs optimized production files
 
       - name: Run tests
-        run: php artisan pest || php artisan phpunit || echo "No tests found - continuing"
-        # Attempts to run the project's test suite:
-        # 1. Runs Pest tests if available
-        # 2. Falls back to PHPUnit if Pest is missing
-        # 3. If no tests exist, it prints a message and continues without failing the workflow
+        run: php artisan test
+        continue-on-error: true
+        # Runs the Laravel test suite.
+        # If some tests fail, the step is marked as failed in logs,
+        # but the workflow continues (does not block the build/deploy pipeline).
 
       - name: Create ZIP artifact
         run: |
