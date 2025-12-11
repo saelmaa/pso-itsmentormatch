@@ -29,9 +29,14 @@
                 <h2 class="font-semibold text-lg text-gray-900 mb-2">
                     2. How do I book a mentoring session?
                 </h2>
-                <p class="text-gray-600 text-sm md:text-base">
-                    You can browse available mentors on the <span class="font-semibold">Mentors</span> page,
-                    open a mentor profile, and follow the steps to create a new session. Make sure you are logged in first.
+                <p class="text-gray-600">
+                    You can browse available mentors on the
+                    <a href="{{ route('mentors.index') }}"
+                    class="text-teal-600 font-semibold hover:underline">
+                        Mentors
+                    </a>
+                    page, open a mentor profile, and follow the steps to create a new session.
+                    Make sure you are logged in first.
                 </p>
             </div>
 
