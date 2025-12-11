@@ -1,42 +1,69 @@
-name: CI - Development   # The name of this workflow
+name: CI - Development   # Name of the CI workflow
 
 on:
   push:
     branches:
-      - master           # This workflow triggers automatically whenever code is pushed to the master branch
+      - master           # Trigger workflow whenever code is pushed to the master branch
 
 jobs:
   test-and-build:
-    runs-on: ubuntu-latest   # The job runs inside the latest Ubuntu Linux environment
+    runs-on: ubuntu-latest   # Run on the latest Ubuntu environment
 
     steps:
+      # 1. Checkout the repository code
       - name: Checkout code
-        uses: actions/checkout@v4   
+        uses: actions/checkout@v4
+        # This action downloads your repository into the CI runner,
+        # allowing GitHub Actions to access all project files.
 
+      # 2. Install PHP and required extensions
       - name: Setup PHP
         uses: shivammathur/setup-php@v2
         with:
           php-version: '8.4'
           extensions: mbstring, xml, bcmath, intl
+        # This action configures the PHP runtime needed to execute Laravel.
 
+      # 3. Install Composer dependencies (including dev dependencies for testing)
       - name: Install Composer dependencies
         run: composer install --prefer-dist --no-progress --no-interaction
-        # Install including dev dependencies so phpunit & pest are available.
+        # Installs backend dependencies required by Laravel and the test suite.
 
+      # 4. Install Node dependencies
       - name: Install NPM dependencies
         run: npm ci
+        # Installs frontend dependencies based on package-lock.json,
+        # ensuring a reproducible environment.
 
+      # 5. Build frontend assets (CSS/JS)
       - name: Build assets
         run: npm run build
+        # Compiles and bundles assets using Vite/Mix into production-ready files.
 
+      # 6. Prepare the Laravel environment
+      - name: Prepare Laravel environment
+        run: |
+          cp .env.example .env
+          php artisan key:generate
+        # Since CI does not contain your local .env file,
+        # we copy .env.example and generate a valid APP_KEY.
+        # This prevents runtime errors during tests that rely on environment variables.
+
+      # 7. Run the test suite (but allow failures)
       - name: Run tests
         run: php artisan test || echo "Some tests failed, but continuing pipeline"
-        # If tests fail, the pipeline will still continue.
+        # Runs all Laravel tests.
+        # If tests fail, the workflow does NOT stop.
+        # This ensures the CI pipeline continues even when certain tests are still incomplete.
 
+      # 8. Create a deployment-ready ZIP artifact
       - name: Create ZIP artifact
         run: |
           zip -r deploy-dev.zip . -x "vendor/*" "node_modules/*" ".git/*" "tests/*"
+        # Packages the project into a clean ZIP file,
+        # excluding heavy directories that should not be deployed.
 
+      # 9. Upload the ZIP artifact so other workflows (e.g., deployment) can use it
       - name: Upload artifact
         uses: actions/upload-artifact@v4
         with:
