@@ -74,10 +74,10 @@ Route::middleware(['auth'])->group(function () {
     Route::post('/goals', [GoalController::class, 'store'])->name('goals.store');
 });
 
-//New Feature: Guidelines
-Route::get('/guidelines', function () {
-    return view('guidelines');
-})->name('guidelines');
+// //New Feature: Guidelines
+// Route::get('/guidelines', function () {
+//     return view('guidelines');
+// })->name('guidelines');
 
 // FAQ
 Route::get('/faq', function () {
