@@ -1,61 +1,189 @@
-<p align="center"><a href="https://laravel.com" target="_blank"><img src="https://raw.githubusercontent.com/laravel/art/master/logo-lockup/5%20SVG/2%20CMYK/1%20Full%20Color/laravel-logolockup-cmyk-red.svg" width="400" alt="Laravel Logo"></a></p>
+# 🎓ITS MentorMatch
 
-<p align="center">
-<a href="https://github.com/laravel/framework/actions"><img src="https://github.com/laravel/framework/workflows/tests/badge.svg" alt="Build Status"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/dt/laravel/framework" alt="Total Downloads"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/v/laravel/framework" alt="Latest Stable Version"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/l/laravel/framework" alt="License"></a>
-</p>
+ITS MentorMatch is a web-based mentoring platform designed for ITS students to connect with alumni and senior mentors for academic guidance, skill development, and career insights.
 
-## About Laravel
+This project is developed as a **DevOps-focused final project**, with a strong emphasis on **Continuous Integration (CI)** using **GitHub Actions**.
 
-Laravel is a web application framework with expressive, elegant syntax. We believe development must be an enjoyable and creative experience to be truly fulfilling. Laravel takes the pain out of development by easing common tasks used in many web projects, such as:
+---
 
-- [Simple, fast routing engine](https://laravel.com/docs/routing).
-- [Powerful dependency injection container](https://laravel.com/docs/container).
-- Multiple back-ends for [session](https://laravel.com/docs/session) and [cache](https://laravel.com/docs/cache) storage.
-- Expressive, intuitive [database ORM](https://laravel.com/docs/eloquent).
-- Database agnostic [schema migrations](https://laravel.com/docs/migrations).
-- [Robust background job processing](https://laravel.com/docs/queues).
-- [Real-time event broadcasting](https://laravel.com/docs/broadcasting).
+## 📌 Project Overview
 
-Laravel is accessible, powerful, and provides tools required for large, robust applications.
+In modern software development, applications must be delivered quickly, reliably, and consistently. Manual testing and deployment processes are often error-prone and inefficient.
 
-## Learning Laravel
+ITS MentorMatch applies DevOps practices to automate testing and build processes. By using GitHub Actions, every code change is automatically validated to ensure build readiness and system stability before deployment.
 
-Laravel has the most extensive and thorough [documentation](https://laravel.com/docs) and video tutorial library of all modern web application frameworks, making it a breeze to get started with the framework.
+**Architecture**: Laravel (Pure MVC)  
+**Database**: MySQL  
+**Deployment**: VPS Environment (Hostinger)
 
-You may also try the [Laravel Bootcamp](https://bootcamp.laravel.com), where you will be guided through building a modern Laravel application from scratch.
+---
 
-If you don't feel like reading, [Laracasts](https://laracasts.com) can help. Laracasts contains thousands of video tutorials on a range of topics including Laravel, modern PHP, unit testing, and JavaScript. Boost your skills by digging into our comprehensive video library.
+## 🛠 Technology Stack
 
-## Laravel Sponsors
+### Application & Database
+- **Framework**: Laravel (Pure MVC)
+- **Backend Language**: PHP 8.4
+- **Database**: MySQL
+- **Frontend**: Blade + Tailwind CSS
 
-We would like to extend our thanks to the following sponsors for funding Laravel development. If you are interested in becoming a sponsor, please visit the [Laravel Partners program](https://partners.laravel.com).
+### Development Tools
+- **Composer**: PHP dependency management
+- **Node.js & NPM**: Frontend asset management
+- **DBeaver**: Database inspection and table preview
 
-### Premium Partners
+### Server & Infrastructure
+- **VPS Provider**: Hostinger (KVM 1)
+- **Web Server / Load Balancer**: Nginx
+- **Firewall**: UFW
+- **Remote Access**: OpenSSH (public–private key authentication)
 
-- **[Vehikl](https://vehikl.com)**
-- **[Tighten Co.](https://tighten.co)**
-- **[Kirschbaum Development Group](https://kirschbaumdevelopment.com)**
-- **[64 Robots](https://64robots.com)**
-- **[Curotec](https://www.curotec.com/services/technologies/laravel)**
-- **[DevSquad](https://devsquad.com/hire-laravel-developers)**
-- **[Redberry](https://redberry.international/laravel-development)**
-- **[Active Logic](https://activelogic.com)**
+### DevOps & CI
+- **CI Tool**: GitHub Actions
+- **Scope**: Continuous Integration (testing & build automation)
 
-## Contributing
+---
 
-Thank you for considering contributing to the Laravel framework! The contribution guide can be found in the [Laravel documentation](https://laravel.com/docs/contributions).
+## 🚀 Local Development Setup
 
-## Code of Conduct
+### Prerequisites
+- PHP >= 8.4
+- Composer
+- Node.js & NPM
+- MySQL
 
-In order to ensure that the Laravel community is welcoming to all, please review and abide by the [Code of Conduct](https://laravel.com/docs/contributions#code-of-conduct).
+### Installation Steps
 
-## Security Vulnerabilities
+#### 1. Clone the Repository
+```bash
+git clone <repository-url>
+cd its-mentormatch
+```
 
-If you discover a security vulnerability within Laravel, please send an e-mail to Taylor Otwell via [taylor@laravel.com](mailto:taylor@laravel.com). All security vulnerabilities will be promptly addressed.
+#### 2. Install PHP Dependencies
+```bash
+composer install
+```
 
-## License
+#### 3. Environment Setup
+```bash
+cp .env.example .env
+php artisan key:generate
+```
+> **Note**: Database schema is prepared manually; this project does not use Laravel migrations.
 
-The Laravel framework is open-sourced software licensed under the [MIT license](https://opensource.org/licenses/MIT).
+#### 4. Configure Database
+Edit .env and set your MySQL credentials:
+```bash
+DB_CONNECTION=mysql
+DB_DATABASE=its_mentormatch
+DB_USERNAME=your_username
+DB_PASSWORD=your_password
+```
+
+#### 5. Install & Build Frontend
+```bash
+npm install
+npm run build
+```
+
+#### 6. Run the Application
+```bash
+php artisan serve
+```
+Access at: http://127.0.0.1:8000
+
+---
+
+## 🧪 Testing Strategy
+
+### Running Tests Locally
+
+* **Standard Test**
+
+  ```bash
+  php artisan test
+  ```
+
+* **With Code Coverage**
+
+  ```bash
+  php artisan test --coverage
+  ```
+
+### Coverage Report
+
+A coverage report is generated at:
+
+```
+coverage/index.html
+```
+
+The report provides insights into:
+
+* Covered vs. uncovered code percentages
+* Coverage percentage per file
+* Line and method coverage analysis
+
+> **Note**: This report is intended for development and academic evaluation only. It is **not exposed in production** for security reasons.
+
+### Test Environment Configuration
+
+Tests are executed using an **SQLite in-memory database** (configured in `phpunit.xml`) to ensure:
+
+* **Test Isolation**: The production database (MySQL) is never accessed
+* **Fast Execution**: No disk I/O overhead
+* **No Dependencies**: Independent of production data state
+
+---
+
+## ⚙️ CI Pipeline (GitHub Actions)
+
+The CI pipeline runs automatically on **every push to the `master` branch**.
+
+### CI Workflow Includes
+
+* Code checkout
+* PHP setup (**PHP 8.4**)
+* Composer & NPM dependency installation
+* Frontend asset build
+* Automated test execution
+
+### Test Execution Strategy in CI
+
+```bash
+php artisan test || echo "Some tests failed, but continuing pipeline"
+```
+
+This approach allows test results to remain visible in CI logs while still allowing the pipeline to continue.
+
+> **Note**: This strategy is intentionally used for **academic and demonstration purposes** to showcase CI execution without blocking deployment artifacts.
+
+---
+
+## 🌐 Deployment Notes
+
+* **Production URL**: [http://72.61.141.156/](http://72.61.141.156/)
+* **Web Server**: Nginx (used as both web server and load balancer)
+* **Security**:
+
+  * UFW allows required ports (HTTP, HTTPS, SSH)
+  * SSH key-based authentication is enforced
+
+---
+
+## 📝 Notes for Reviewers
+
+* **Database**: Data is not included in the repository; the schema is managed manually
+* **Safety**: Tests use an in-memory SQLite database for total isolation
+* **Visibility**: CI behavior and logs can be reviewed directly in the GitHub Actions tab
+* **DevOps Focus**: This project follows DevOps best practices within an academic context, emphasizing build standardization and automated validation
+
+
+
+
+
+
+
+
+
+
