@@ -67,17 +67,12 @@ Route::middleware(['auth'])->group(function () {
     Route::get('/settings', [SettingsController::class, 'edit'])->name('settings.edit');
     Route::put('/settings', [SettingsController::class, 'update'])->name('settings.update');
 
-    // // Dashboard
+    // Dashboard
     Route::get('/my/progress', [DashboardController::class, 'index'])->name('dashboard');
 
-    // // Goals
+    // Goals
     Route::post('/goals', [GoalController::class, 'store'])->name('goals.store');
 });
-
-// //New Feature: Guidelines
-// Route::get('/guidelines', function () {
-//     return view('guidelines');
-// })->name('guidelines');
 
 // FAQ
 Route::get('/faq', function () {

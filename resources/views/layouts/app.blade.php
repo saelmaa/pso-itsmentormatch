@@ -168,7 +168,7 @@
                         <li><a href="#" class="hover:text-white transition-colors">Help Center</a></li>
                         <li><a href="#" class="hover:text-white transition-colors">Contact Us</a></li>
                         {{-- 🔹 Make FAQ in footer link to the new FAQ route --}}
-                        <!-- <li><a href="{{ route('faq') }}" class="hover:text-white transition-colors">FAQ</a></li> -->
+                        <li><a href="{{ route('faq') }}" class="hover:text-white transition-colors">FAQ</a></li>
                     </ul>
                 </div>
                 <div>
